@@ -12,6 +12,10 @@ const drawKicker = document.querySelector('#drawKicker');
 const drawTitle = document.querySelector('#drawTitle');
 const nextRevealButton = document.querySelector('#nextRevealButton');
 const closeOverlayButton = document.querySelector('#closeOverlayButton');
+const seatRevealPanel = document.querySelector('#seatRevealPanel');
+const seatRevealBadge = document.querySelector('#seatRevealBadge');
+const seatRevealMessage = document.querySelector('#seatRevealMessage');
+const classroomNextButton = document.querySelector('#classroomNextButton');
 const toast = document.querySelector('#toast');
 const confettiCanvas = document.querySelector('#confettiCanvas');
 const confettiContext = confettiCanvas.getContext('2d');
@@ -202,6 +206,8 @@ function startDraw() {
   desks.forEach((desk) => { desk.number = null; });
   revealQueue = shuffled(parsed.numbers);
   revealIndex = 0;
+  seatRevealPanel.classList.remove('show');
+  classroom.classList.remove('reveal-stage');
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden', 'false');
   lotteryBall.classList.add('spinning');
@@ -259,11 +265,66 @@ function revealNext() {
   drawTitle.textContent = `${number}번, 자리를 찾았어요!`;
   revealIndex += 1;
   nextRevealButton.hidden = false;
-  nextRevealButton.textContent = revealIndex < desks.length ? '다음 자리 공개 →' : '마지막 자리 확인 →';
+  nextRevealButton.innerHTML = '자리에서 확인하기 <span>→</span>';
   render();
-  const element = document.querySelector(`[data-id="${desks[revealIndex - 1].id}"]`);
-  element?.classList.add('revealing');
-  setTimeout(() => element?.classList.remove('revealing'), 700);
+}
+
+function showRevealedSeat() {
+  if (!revealIndex) return;
+  closeOverlay();
+
+  const deskIndex = revealIndex - 1;
+  const desk = desks[deskIndex];
+  classroom.classList.add('reveal-stage');
+  seatRevealBadge.textContent = `${revealIndex}번째 자리 배정 완료`;
+  seatRevealMessage.textContent = `${desk.number}번이 자리를 찾았어요!`;
+  classroomNextButton.innerHTML = revealIndex < desks.length
+    ? '다음 번호 뽑기 <span>→</span>'
+    : '자리뽑기 완료 <span>✓</span>';
+  seatRevealPanel.classList.add('show');
+
+  requestAnimationFrame(() => {
+    const element = document.querySelector(`[data-id="${desk.id}"]`);
+    element?.classList.add('placement-focus');
+  });
+
+  if (revealIndex >= desks.length) {
+    launchConfetti();
+    saveLocal(false);
+  }
+}
+
+function spinNextNumber() {
+  seatRevealPanel.classList.remove('show');
+  classroom.classList.remove('reveal-stage');
+
+  if (revealIndex >= desks.length) {
+    document.querySelectorAll('.student-desk').forEach((element) => element.classList.remove('placement-focus'));
+    statusText.textContent = '자리 배정 완료';
+    return;
+  }
+
+  document.querySelectorAll('.student-desk').forEach((element) => element.classList.remove('placement-focus'));
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  lotteryBall.classList.add('spinning');
+  nextRevealButton.hidden = true;
+  closeOverlayButton.hidden = true;
+  drawKicker.textContent = `${revealIndex + 1}번째 자리의 주인공을 찾는 중...`;
+  drawTitle.textContent = '다음 번호가 빙글빙글 돌고 있어요!';
+
+  const remaining = revealQueue.slice(revealIndex);
+  let tickerIndex = 0;
+  const ticker = setInterval(() => {
+    lotteryBall.textContent = remaining[tickerIndex % remaining.length];
+    tickerIndex += 1;
+  }, 75);
+
+  setTimeout(() => {
+    clearInterval(ticker);
+    lotteryBall.classList.remove('spinning');
+    revealNext();
+  }, 900);
 }
 
 function closeOverlay() {
@@ -273,6 +334,8 @@ function closeOverlay() {
 
 function clearAssignments() {
   desks.forEach((desk) => { desk.number = null; });
+  seatRevealPanel.classList.remove('show');
+  classroom.classList.remove('reveal-stage');
   render();
   saveLocal(false);
   showToast('배정된 번호를 모두 지웠어요.');
@@ -374,7 +437,8 @@ document.querySelectorAll('.example-button').forEach((button) => {
   });
 });
 numberInput.addEventListener('input', validateNumbers);
-nextRevealButton.addEventListener('click', revealNext);
+nextRevealButton.addEventListener('click', showRevealedSeat);
+classroomNextButton.addEventListener('click', spinNextNumber);
 closeOverlayButton.addEventListener('click', closeOverlay);
 
 document.addEventListener('keydown', (event) => {

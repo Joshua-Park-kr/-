@@ -104,6 +104,13 @@
             <div class="teacher-desk" aria-label="교탁"><span>선생님</span></div>
             <div class="desk-layer" id="deskLayer"></div>
             <div class="empty-hint" id="emptyHint">왼쪽에서 책상을 추가해 주세요</div>
+            <div class="seat-reveal-panel" id="seatRevealPanel" aria-live="polite">
+              <div class="seat-reveal-copy">
+                <span class="seat-reveal-badge" id="seatRevealBadge">1번째 자리</span>
+                <strong id="seatRevealMessage">1번이 자리를 찾았어요!</strong>
+              </div>
+              <button id="classroomNextButton" type="button">다음 번호 뽑기 <span>→</span></button>
+            </div>
           </div>
 
           <div class="legend">
@@ -121,7 +128,7 @@
         <p id="drawKicker">행운의 자리를 찾는 중...</p>
         <div class="lottery-ball" id="lotteryBall">?</div>
         <h2 id="drawTitle">번호들이 교실을 여행하고 있어요!</h2>
-        <button id="nextRevealButton" type="button" hidden>다음 자리 공개 <span>→</span></button>
+        <button id="nextRevealButton" type="button" hidden>자리에서 확인하기 <span>→</span></button>
         <button id="closeOverlayButton" type="button" hidden>자리 확인하기 <span>→</span></button>
       </div>
     </div>
