@@ -28,6 +28,7 @@ let desks = [];
 let selectedId = null;
 let drawMode = 'all';
 let revealQueue = [];
+let revealDeskQueue = [];
 let revealIndex = 0;
 let confettiPieces = [];
 let confettiFrame = null;
@@ -234,6 +235,7 @@ function startDraw() {
 
   desks.forEach((desk) => { desk.number = null; });
   revealQueue = shuffled(parsed.numbers);
+  revealDeskQueue = shuffled(desks.map((desk) => desk.id));
   revealIndex = 0;
   seatRevealPanel.classList.remove('show');
   classroom.classList.remove('reveal-stage');
@@ -263,10 +265,14 @@ function revealAll() {
   lotteryBall.textContent = '짠!';
   drawKicker.textContent = '두근두근, 자리 공개!';
   drawTitle.textContent = '새로운 짝꿍과 즐거운 하루 보내요!';
-  desks.forEach((desk, index) => { desk.number = revealQueue[index]; });
+  revealDeskQueue.forEach((deskId, index) => {
+    const desk = desks.find((item) => item.id === deskId);
+    desk.number = revealQueue[index];
+  });
   render();
-  document.querySelectorAll('.student-desk').forEach((element, index) => {
+  revealDeskQueue.forEach((deskId, index) => {
     setTimeout(() => {
+      const element = document.querySelector(`[data-id="${deskId}"]`);
       element.classList.add('revealing');
       setTimeout(() => element.classList.remove('revealing'), 700);
     }, index * 55);
@@ -288,7 +294,8 @@ function revealNext() {
   }
 
   const number = revealQueue[revealIndex];
-  desks[revealIndex].number = number;
+  const desk = desks.find((item) => item.id === revealDeskQueue[revealIndex]);
+  desk.number = number;
   lotteryBall.textContent = number;
   drawKicker.textContent = `${revealIndex + 1}번째 자리의 주인공은`;
   drawTitle.textContent = `${number}번, 자리를 찾았어요!`;
@@ -302,8 +309,7 @@ function showRevealedSeat() {
   if (!revealIndex) return;
   closeOverlay();
 
-  const deskIndex = revealIndex - 1;
-  const desk = desks[deskIndex];
+  const desk = desks.find((item) => item.id === revealDeskQueue[revealIndex - 1]);
   classroom.classList.add('reveal-stage');
   seatRevealBadge.textContent = `${revealIndex}번째 자리 배정 완료`;
   seatRevealMessage.textContent = `${desk.number}번이 자리를 찾았어요!`;
