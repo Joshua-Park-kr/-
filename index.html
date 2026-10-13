@@ -47,7 +47,7 @@
             <div class="selection-tools" id="selectionTools" aria-live="polite">
               <div>
                 <strong id="selectedDeskLabel">책상을 선택해 주세요</strong>
-                <small>드래그해서 원하는 곳으로 옮길 수 있어요.</small>
+                <small>드래그해서 놓으면 행과 열에 맞춰져요.</small>
               </div>
               <div class="rotate-actions">
                 <button id="rotateLeftButton" type="button" aria-label="왼쪽으로 회전">↶</button>
@@ -96,12 +96,20 @@
           <div class="classroom" id="classroom">
             <div class="blackboard">
               <span class="chalk-star">✦</span>
-              <div contenteditable="true" spellcheck="false" aria-label="칠판 문구">오늘도 신나는 우리 반!</div>
+              <div contenteditable="plaintext-only" role="textbox" spellcheck="false" aria-label="칠판 문구. 클릭해서 수정할 수 있습니다." data-placeholder="칠판에 문구를 적어 보세요">오늘도 신나는 우리 반!</div>
               <span class="chalk-smile">◡̈</span>
             </div>
             <div class="window-light" aria-hidden="true"></div>
-            <div class="plant" aria-hidden="true"><span>●</span><span>●</span><span>●</span><i></i></div>
-            <div class="teacher-desk" aria-label="교탁"><span>선생님</span></div>
+            <div class="plant" aria-hidden="true">
+              <i class="plant-stem stem-left"></i>
+              <i class="plant-stem stem-middle"></i>
+              <i class="plant-stem stem-right"></i>
+              <i class="plant-leaf leaf-one"></i>
+              <i class="plant-leaf leaf-two"></i>
+              <i class="plant-leaf leaf-three"></i>
+              <i class="plant-leaf leaf-four"></i>
+              <i class="plant-pot"></i>
+            </div>
             <div class="desk-layer" id="deskLayer"></div>
             <div class="empty-hint" id="emptyHint">왼쪽에서 책상을 추가해 주세요</div>
             <div class="seat-reveal-panel" id="seatRevealPanel" aria-live="polite">
@@ -114,9 +122,10 @@
           </div>
 
           <div class="legend">
-            <span><i class="legend-dot drag"></i> 드래그로 이동</span>
+            <span><i class="legend-dot drag"></i> 드래그 후 자동 정렬</span>
             <span><i class="legend-dot select"></i> 클릭해서 선택</span>
-            <span><kbd>R</kbd> 선택한 책상 회전</span>
+            <span><kbd>Q</kbd> 반시계 회전</span>
+            <span><kbd>E</kbd> 시계 회전</span>
           </div>
         </section>
       </main>

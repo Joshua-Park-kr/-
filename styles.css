@@ -284,7 +284,35 @@ textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(35, 107,
   box-shadow: 0 5px 0 rgba(101, 69, 34, .25);
   font: 19px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
 }
-.blackboard div { min-width: 50%; text-align: center; outline: 0; }
+.blackboard div {
+  min-width: 50%;
+  max-width: calc(100% - 75px);
+  padding: 7px 9px;
+  overflow: hidden;
+  outline: 1px dashed transparent;
+  border-radius: 5px;
+  cursor: text;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: text;
+  transition: outline-color .18s, background .18s;
+}
+.blackboard div:hover { outline-color: rgba(255,255,255,.35); background: rgba(255,255,255,.05); }
+.blackboard div:focus { outline-color: #ffe589; background: rgba(255,255,255,.08); }
+.blackboard div:empty::before { content: attr(data-placeholder); color: rgba(255,255,255,.48); }
+.blackboard::after {
+  content: "클릭해서 수정";
+  position: absolute;
+  right: 7px;
+  bottom: -24px;
+  padding: 3px 7px;
+  border-radius: 0 0 6px 6px;
+  color: #765331;
+  background: #d7ba8a;
+  font-size: 8px;
+  font-weight: 800;
+}
 .chalk-star { color: #ffe589; }
 .chalk-smile { transform: rotate(-8deg); }
 
@@ -303,30 +331,29 @@ textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(35, 107,
 .window-light::before { left: 50%; width: 5px; height: 100%; transform: translateX(-50%); }
 .window-light::after { top: 50%; width: 100%; height: 5px; transform: translateY(-50%); }
 
-.teacher-desk {
+.plant { position: absolute; z-index: 2; top: 43px; left: 30px; width: 68px; height: 105px; filter: drop-shadow(0 5px 4px rgba(55, 69, 43, .17)); }
+.plant-stem { position: absolute; z-index: 1; bottom: 25px; width: 3px; border-radius: 3px; background: #41744b; transform-origin: bottom; }
+.stem-left { left: 29px; height: 55px; transform: rotate(-15deg); }
+.stem-middle { left: 34px; height: 72px; }
+.stem-right { left: 38px; height: 52px; transform: rotate(17deg); }
+.plant-leaf { position: absolute; z-index: 2; width: 28px; height: 17px; border-radius: 100% 5% 100% 5%; background: linear-gradient(145deg, #79b562, #3f7e4d); transform-origin: 100% 100%; }
+.leaf-one { top: 23px; left: 8px; transform: rotate(25deg); }
+.leaf-two { top: 40px; left: 12px; width: 24px; height: 15px; transform: rotate(5deg); }
+.leaf-three { top: 16px; right: 6px; border-radius: 5% 100% 5% 100%; background: linear-gradient(215deg, #85bd68, #4d8e55); transform: rotate(-18deg); }
+.leaf-four { top: 39px; right: 8px; width: 25px; height: 15px; border-radius: 5% 100% 5% 100%; transform: rotate(-2deg); }
+.plant-pot {
   position: absolute;
   z-index: 3;
-  top: 112px;
-  left: 50%;
-  width: 108px;
-  height: 45px;
-  transform: translateX(-50%);
-  display: grid;
-  place-items: center;
-  border: 2px solid #9a6036;
-  border-radius: 6px 6px 3px 3px;
-  color: #5a321a;
-  background: #dca861;
-  box-shadow: 0 6px 0 #995e33, 0 9px 10px rgba(77, 47, 25, .18);
-  font: 11px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  bottom: 0;
+  left: 15px;
+  width: 42px;
+  height: 32px;
+  border-top: 6px solid #b9543c;
+  border-radius: 4px 4px 12px 12px;
+  background: linear-gradient(90deg, #d86c4f, #ed8b68 55%, #c85b44);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,.2);
 }
-
-.plant { position: absolute; z-index: 2; top: 85px; left: 30px; width: 55px; height: 80px; }
-.plant span { position: absolute; width: 24px; height: 40px; overflow: hidden; color: #5d9b4e; font-size: 34px; }
-.plant span:nth-child(1) { left: 7px; transform: rotate(-26deg); }
-.plant span:nth-child(2) { left: 23px; top: 4px; color: #3f8251; transform: rotate(24deg); }
-.plant span:nth-child(3) { left: 16px; top: -10px; color: #76ae5b; }
-.plant i { position: absolute; bottom: 0; left: 11px; width: 34px; height: 29px; border-radius: 3px 3px 10px 10px; background: #dc7355; }
+.plant-pot::after { content: ""; position: absolute; left: 5px; right: 5px; bottom: -5px; height: 5px; border-radius: 0 0 6px 6px; background: #a94736; }
 
 .desk-layer { position: absolute; inset: 0; z-index: 5; }
 
@@ -340,6 +367,7 @@ textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(35, 107,
   transition: filter .16s, box-shadow .16s;
 }
 .student-desk.dragging { cursor: grabbing; z-index: 50; filter: drop-shadow(0 10px 7px rgba(52, 43, 29, .25)); }
+.student-desk.settling { transition: left .24s cubic-bezier(.2,.9,.3,1), top .24s cubic-bezier(.2,.9,.3,1), filter .16s; }
 .student-desk.selected .desk-top { outline: 3px solid var(--coral); outline-offset: 3px; }
 .desk-top {
   position: absolute;

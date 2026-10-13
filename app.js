@@ -141,10 +141,39 @@ function bindDeskInteractions(element, desk) {
   const finish = (event) => {
     if (element.hasPointerCapture(event.pointerId)) element.releasePointerCapture(event.pointerId);
     element.classList.remove('dragging');
-    if (moved) saveLocal(false);
+    if (moved) {
+      const snapped = getSnappedPosition(desk);
+      desk.x = snapped.x;
+      desk.y = snapped.y;
+      element.classList.add('settling');
+      element.style.left = `calc(${desk.x}% - ${DESK_WIDTH / 2}px)`;
+      element.style.top = `calc(${desk.y}% - ${DESK_HEIGHT / 2}px)`;
+      setTimeout(() => element.classList.remove('settling'), 260);
+      saveLocal(false);
+    }
   };
   element.addEventListener('pointerup', finish);
   element.addEventListener('pointercancel', finish);
+}
+
+function getSnappedPosition(desk) {
+  const others = desks.filter((item) => item.id !== desk.id);
+  const snapDistance = 3.5;
+
+  const snapAxis = (value, candidates) => {
+    const nearest = candidates.reduce((best, candidate) => {
+      const distance = Math.abs(candidate - value);
+      return distance < best.distance ? { value: candidate, distance } : best;
+    }, { value, distance: Infinity });
+
+    if (nearest.distance <= snapDistance) return nearest.value;
+    return Math.round(value / 2.5) * 2.5;
+  };
+
+  return {
+    x: Math.max(6, Math.min(94, snapAxis(desk.x, others.map((item) => item.x)))),
+    y: Math.max(24, Math.min(94, snapAxis(desk.y, others.map((item) => item.y)))),
+  };
 }
 
 function renderSelectionOnly() {
@@ -442,9 +471,26 @@ classroomNextButton.addEventListener('click', spinNextNumber);
 closeOverlayButton.addEventListener('click', closeOverlay);
 
 document.addEventListener('keydown', (event) => {
-  if (event.key.toLowerCase() === 'r' && document.activeElement !== numberInput) rotateSelected(event.shiftKey ? -45 : 45);
+  const activeElement = document.activeElement;
+  const isEditingText = activeElement?.matches('input, textarea') || activeElement?.isContentEditable;
+  if (!isEditingText && event.key.toLowerCase() === 'q') {
+    event.preventDefault();
+    rotateSelected(-45);
+  }
+  if (!isEditingText && event.key.toLowerCase() === 'e') {
+    event.preventDefault();
+    rotateSelected(45);
+  }
   if (event.key === 'Escape' && overlay.classList.contains('open') && !closeOverlayButton.hidden) closeOverlay();
 });
+
+const boardText = document.querySelector('.blackboard [contenteditable]');
+let boardSaveTimer;
+boardText.addEventListener('input', () => {
+  clearTimeout(boardSaveTimer);
+  boardSaveTimer = setTimeout(() => saveLocal(false), 350);
+});
+boardText.addEventListener('blur', () => saveLocal(false));
 
 if (!loadLocal()) desks = defaultLayout(20);
 render();
